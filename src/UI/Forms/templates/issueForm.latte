@@ -1,0 +1,24 @@
+{control form}
+
+<div n:if="$issue">
+    <div n:foreach="$issue->getAttachments() as $attachment" style="display: inline-block">
+        <a n:href="getAttachment! $attachment->getContentUrl()"
+           style="display: block; text-align: center; padding: 10px" target="_blank">
+            {var $ext = strtolower(pathinfo($attachment->getContentUrl(), PATHINFO_EXTENSION))}
+            {if in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp'], true)}
+                <img src="{link getAttachment! $attachment->getContentUrl()}" style="max-width: 200px; height: auto">
+            {else}
+                <span style="font-size: 60px">&#10063;</span>
+            {/if}
+            <br>
+            {$attachment->getDescription()}
+            ({$attachment->getFilesize()|bytes})
+        </a>
+    </div>
+
+    <hr>
+</div>
+
+<button class="btn btn-primary" onclick="document.getElementById('redmine-form-submit').click();" style="margin-bottom: 30px">
+    Uložit
+</button>

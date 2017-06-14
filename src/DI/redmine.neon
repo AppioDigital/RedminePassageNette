@@ -1,0 +1,120 @@
+# fetchers
+fetcher.stream:
+    class: Appio\Redmine\Fetcher\StreamFetcher
+    arguments:
+        - @httplug.client.redmine
+        - @httplug.messageFactory
+
+fetcher.array:
+    class: Appio\Redmine\Fetcher\ArrayFetcher
+    arguments:
+        - @extension.fetcher.stream
+        - @symfony.serializer.json.encoder
+
+fetcher.object:
+    class: Appio\Redmine\Fetcher\ObjectFetcher
+    arguments:
+        - @extension.fetcher.array
+
+fetcher.issue:
+    class: Appio\Redmine\Fetcher\ObjectFetcher
+    arguments:
+        - @extension.fetcher.array
+        - @extension.normalizer.entity.issue
+
+# normalizers
+normalizer.entity.customField:
+    class: Appio\Redmine\Normalizer\Entity\CustomFieldNormalizer
+
+normalizer.entity.upload:
+    class: Appio\Redmine\Normalizer\Entity\UploadNormalizer
+
+normalizer.entity.issueUser:
+    class: Appio\Redmine\Normalizer\Entity\UserNormalizer
+
+normalizer.entity.attachment:
+    class: Appio\Redmine\Normalizer\Entity\AttachmentNormalizer
+    arguments:
+        - @extension.normalizer.entity.issueUser
+
+normalizer.entity.status:
+    class: Appio\Redmine\Normalizer\Entity\StatusNormalizer
+
+normalizer.entity.priority:
+    class: Appio\Redmine\Normalizer\Entity\PriorityNormalizer
+
+normalizer.entity.tracker:
+    class: Appio\Redmine\Normalizer\Entity\TrackerNormalizer
+
+normalizer.entity.project:
+    class: Appio\Redmine\Normalizer\Entity\ProjectNormalizer
+
+normalizer.entity.issueProject:
+    class: Appio\Redmine\Normalizer\Entity\IssueProjectNormalizer
+
+normalizer.entity.issueRelations:
+    class: Symfony\Component\Serializer\Serializer
+    arguments:
+        - [@extension.normalizer.entity.issueProject, @extension.normalizer.entity.issueUser, @extension.normalizer.entity.attachment, @extension.normalizer.entity.status, @extension.normalizer.entity.priority, @extension.normalizer.entity.tracker, @extension.normalizer.entity.customField]
+        - [@symfony.serializer.json.encoder]
+
+normalizer.entity.issue:
+    class: Appio\Redmine\Normalizer\Entity\IssueNormalizer
+    arguments:
+        - @extension.normalizer.entity.issueRelations
+
+normalizer.dto.issueRelations:
+    class: Symfony\Component\Serializer\Serializer
+    arguments:
+        - [@extension.normalizer.entity.upload, @extension.normalizer.entity.customField]
+        - [@symfony.serializer.json.encoder]
+
+normalizer.dto.issue:
+    class: Appio\Redmine\Normalizer\DTO\IssueNormalizer
+    arguments:
+        - @extension.normalizer.dto.issueRelations
+
+# serializers
+serializer.dto.issue:
+    class: Symfony\Component\Serializer\Serializer
+    arguments:
+        - [@extension.normalizer.dto.issue]
+        - [@symfony.serializer.json.encoder]
+
+
+# managers
+manager.upload:
+    class: Appio\Redmine\Manager\UploadManager
+    arguments:
+        - @symfony.serializer.json.encoder
+        - @extension.normalizer.entity.upload
+        - @httplug.client.redmine
+        - @httplug.messageFactory
+
+manager.issue:
+    class: Appio\Redmine\Manager\IssueManager
+    arguments:
+        - @extension.fetcher.issue
+        - @extension.normalizer.entity.issue
+        - @extension.normalizer.dto.issue
+        - @symfony.serializer.json.encoder
+        - @httplug.client.redmine
+        - @httplug.messageFactory
+
+manager.status:
+    class: Appio\Redmine\Manager\StatusManager
+    arguments:
+        - @extension.fetcher.object
+        - @extension.normalizer.entity.status
+
+manager.priority:
+    class: Appio\Redmine\Manager\PriorityManager
+    arguments:
+        - @extension.fetcher.object
+        - @extension.normalizer.entity.priority
+
+manager.tracker:
+    class: Appio\Redmine\Manager\TrackerManager
+    arguments:
+        - @extension.fetcher.object
+        - @extension.normalizer.entity.tracker

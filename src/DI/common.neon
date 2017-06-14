@@ -1,0 +1,2 @@
+symfony.serializer.json.encoder:
+    class: Symfony\Component\Serializer\Encoder\JsonEncoder

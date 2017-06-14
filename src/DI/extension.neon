@@ -1,0 +1,35 @@
+# api key plugin
+httplug.apiKeyAuthentication:
+    class: Appio\RedmineNette\Httplug\ApiKeyAuthentication
+
+# services
+service.provider.issue:
+    class: Appio\RedmineNette\Services\Providers\ProjectIssueServiceProvider
+    arguments:
+        - %redmine.defaults%
+
+service.provider.projectManager:
+    class: Appio\RedmineNette\Services\Providers\ProjectManagerProvider
+    arguments:
+        - %redmine.defaultProjectId%
+        - @extension.fetcher.object
+        - @extension.normalizer.entity.project
+
+service.issue:
+    class: Appio\RedmineNette\Services\ProjectIssueService
+    factory: @extension.service.provider.issue::getService
+
+service.file:
+    class: Appio\RedmineNette\Services\FileService
+    arguments:
+        - @extension.manager.upload
+        - @httplug.client.redmine
+        - @httplug.messageFactory
+
+# forms
+form.factory.issue:
+    class: Appio\RedmineNette\UI\Forms\IssueFormControlFactory
+
+# grids
+grid.factory.issue:
+    class: Appio\RedmineNette\UI\Grids\IssueGridFactory
