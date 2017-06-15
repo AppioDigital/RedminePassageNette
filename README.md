@@ -13,6 +13,72 @@ The best way to install AppioDigital/RedminePassageNette is using [Composer](htt
 $ composer require appio-digital/redmine-passage-nette
 ```
 
+
+## Required classes
+
+This extension need find two implementation of interfaces:
+ 
+ - `Appio\RedmineNette\Security\RedmineResourceProviderInterface`: for get api key resource
+ - `Appio\RedmineNette\Security\RedmineResourceKeyInterface`: for get api key
+
+Example class LoggedUserProvider implementing `Appio\RedmineNette\Security\RedmineResourceProviderInterface`
+
+
+```php
+class LoggedUserProvider implements RedmineResourceProviderInterface
+{
+    /** @var UserRepo */
+    private $userRepository;
+
+    /** @var User */
+    private $netteUser;
+
+    /**
+     * @param UserRepo $userRepository
+     * @param User $netteUser
+     */
+    public function __construct(UserRepo $userRepository, User $netteUser)
+    {
+        $this->userRepository = $userRepository;
+        $this->netteUser = $netteUser;
+    }
+
+    /**
+     * @return RedmineResourceKeyInterface|null
+     */
+    public function getResource(): ?RedmineResourceKeyInterface
+    {
+        return $this->userRepository->find($this->netteUser->getId());
+    }
+}
+
+```
+
+Example class User implementing `Appio\RedmineNette\Security\RedmineResourceKeyInterface`
+
+
+```php
+class User implements RedmineResourceKeyInterface
+{
+    /**
+     * @var string
+     * @ORM\Column(type="string", nullable=true, unique=true)
+     */
+    private $redmineApiKey;
+
+    /**
+     * @return string
+     */
+    public function getRedmineApiKey(): string
+    {
+        return $this->redmineApiKey ?? '';
+    }
+}
+```
+
+
+## Configuration
+
 ### Minimal configuration
 
 ```yaml

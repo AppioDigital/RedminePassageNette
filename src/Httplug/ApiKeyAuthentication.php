@@ -50,7 +50,7 @@ class ApiKeyAuthentication implements Authentication
             $resource = $this->redmineResourceProvider->getResource();
 
             if ($resource !== null) {
-                return $this->apiKey = $resource->getRedminApiKey();
+                return $this->apiKey = $resource->getRedmineApiKey();
             }
         }
 

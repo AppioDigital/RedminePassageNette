@@ -11,5 +11,5 @@ interface RedmineResourceKeyInterface
     /**
      * @return string
      */
-    public function getRedminApiKey(): string;
+    public function getRedmineApiKey(): string;
 }
