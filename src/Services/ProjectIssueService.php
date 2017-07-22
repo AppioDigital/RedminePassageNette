@@ -160,7 +160,7 @@ class ProjectIssueService
         }
 
         // comment
-        if ($values->journal) {
+        if ($values->journal ?? false) {
             $issueDto->setNotes($values->journal, true);
         }
 
