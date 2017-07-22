@@ -139,11 +139,17 @@ class ProjectIssueService
             $issueDto->setProjectId($issue->getProjectId());
             $issueDto->setTrackerId($issue->getTrackerId());
             $issueDto->setStatusId($issue->getStatusId());
+            if ($issue->getAssignedToId() !== null) {
+                $issueDto->setAssignedToId($issue->getAssignedToId());
+            }
         }
 
         $issueDto->setPriorityId($values->priority);
         $issueDto->setSubject($values->subject);
-        $issueDto->setDescription($values->description);
+
+        if ($values->description ?? false) {
+            $issueDto->setDescription($values->description);
+        }
 
         try {
             $issueDto->setStartDate(Helpers::convertDateStringToRedmineFormat($values->startDate));
@@ -151,6 +157,11 @@ class ProjectIssueService
         } catch (Exception $exception) {
             $form->addError('Špatný formát datumu');
             return null;
+        }
+
+        // comment
+        if ($values->journal) {
+            $issueDto->setNotes($values->journal, true);
         }
 
         // files

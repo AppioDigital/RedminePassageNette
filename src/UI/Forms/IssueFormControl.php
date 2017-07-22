@@ -9,6 +9,7 @@ use Appio\RedmineNette\Services\ProjectIssueService;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Form;
 use Nette\InvalidArgumentException;
+use Nette\Utils\Html;
 
 /**
  * @author Jakub Janata <jakubjanata@gmail.com>
@@ -62,7 +63,7 @@ class IssueFormControl extends Control
         $form->addText('subject', 'Předmět')
             ->setRequired();
 
-        $form->addTextArea('description', 'Popis')
+        $descriptionControl = $form->addTextArea('description', 'Popis', null, 10)
             ->setRequired();
 
         $form->addText('startDate', 'Začátek');
@@ -70,16 +71,34 @@ class IssueFormControl extends Control
 
         $this->initCustomFields($form);
 
-        $form->addGroup('Soubory');
-        $attachmentContainer = $form->addContainer('attachment');
-        $attachmentContainer->addText('description', 'Popis');
-        $attachmentContainer->addUpload('file', 'Soubor');
-
-        $form->addSubmit('save', 'Uložit')
-            ->setHtmlId('redmine-form-submit')
-            ->setHtmlAttribute('style', 'display: none');
-
         if ($this->issue !== null) {
+            // disable editing base description
+            $descriptionControl->setDisabled();
+
+            // allow comments (journals)
+            $journalsEl = Html::el('div');
+
+            foreach ($this->issue->getJournals() as $journal) {
+                if ($journal->isPrivateNotes() === false || $journal->getNotes() === '') {
+                    continue;
+                }
+
+                $journalsEl->addHtml(sprintf(
+                    '<div style="border-top: 1px solid #ccc">%s</div>' .
+                    '<div style="text-align: right; margin-bottom: 20px; font-size: 70%%">(%s - %s)</div>',
+                    $journal->getNotes(),
+                    $journal->getUser()->getName(),
+                    $journal->getCreatedOn()->format('j.n.Y H:i')
+                ));
+            }
+
+            $journalsEl->addHtml('<br><br>');
+
+            $form->addGroup('Komentáře')
+                ->setOption('description', $journalsEl);
+            $form->addTextArea('journal', 'Nový komentář', null, 10);
+
+
             $form->setDefaults([
                 'priority' => $this->issue->getPriorityId(),
                 'subject' => $this->issue->getSubject(),
@@ -90,6 +109,15 @@ class IssueFormControl extends Control
                     $this->issue->getDueDate()->format('d.m.Y') : null
             ]);
         }
+
+        $form->addGroup('Soubory');
+        $attachmentContainer = $form->addContainer('attachment');
+        $attachmentContainer->addText('description', 'Popis');
+        $attachmentContainer->addUpload('file', 'Soubor');
+
+        $form->addSubmit('save', 'Uložit')
+            ->setHtmlId('redmine-form-submit')
+            ->setHtmlAttribute('style', 'display: none');
 
         $form->onSuccess[] = function (Form $form) {
             $issue = $this->issueService->saveIssueFromForm($this->issue, $form);

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Appio\RedmineNette\UI\Grids;
 
+use Appio\Redmine\Entity\Issue;
 use Appio\RedmineNette\Services\Providers\ProjectIssueServiceProvider;
 use Nette\SmartObject;
 use Ublaboo\DataGrid\DataGrid;
@@ -49,6 +50,11 @@ class IssueGridFactory
         $grid->addColumnText('author', 'Autor', 'author.name');
 
         $grid->addColumnText('assignedTo', 'Řeší', 'assignedTo.name');
+
+        $grid->addColumnText('doneRatio', 'Hotovo', 'doneRatio')
+            ->setRenderer(function (Issue $issue) {
+                return $issue->getDoneRatio() . '%';
+            });
 
         $grid->addAction('edit', 'Edit', 'edit');
 

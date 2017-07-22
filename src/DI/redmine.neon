@@ -37,6 +37,11 @@ normalizer.entity.attachment:
     arguments:
         - @extension.normalizer.entity.issueUser
 
+normalizer.entity.journals:
+    class: Appio\Redmine\Normalizer\Entity\JournalNormalizer
+    arguments:
+        - @extension.normalizer.entity.issueUser
+
 normalizer.entity.status:
     class: Appio\Redmine\Normalizer\Entity\StatusNormalizer
 
@@ -55,7 +60,7 @@ normalizer.entity.issueProject:
 normalizer.entity.issueRelations:
     class: Symfony\Component\Serializer\Serializer
     arguments:
-        - [@extension.normalizer.entity.issueProject, @extension.normalizer.entity.issueUser, @extension.normalizer.entity.attachment, @extension.normalizer.entity.status, @extension.normalizer.entity.priority, @extension.normalizer.entity.tracker, @extension.normalizer.entity.customField]
+        - [@extension.normalizer.entity.issueProject, @extension.normalizer.entity.issueUser, @extension.normalizer.entity.attachment, @extension.normalizer.entity.status, @extension.normalizer.entity.priority, @extension.normalizer.entity.tracker, @extension.normalizer.entity.customField, @extension.normalizer.entity.journals]
         - [@symfony.serializer.json.encoder]
 
 normalizer.entity.issue:
