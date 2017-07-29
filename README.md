@@ -121,6 +121,7 @@ redmine:
                     type: text
                     label: Custom
                     defaultValue: hello
+                    disabledAction: add # input disabled - choices "add,edit,all" default false
                 # checkbox
                 15:
                     type: checkbox

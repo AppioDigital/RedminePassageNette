@@ -139,18 +139,29 @@ class IssueFormControl extends Control
         foreach ($this->issueService->getCustomFieldsConfig() as $customFieldId => $customFieldConfig) {
             switch ($customFieldConfig['type'] ?? 'text') {
                 case 'hidden':
-                    $customFields->addHidden($customFieldId, $customFieldConfig['defaultValue']);
+                    $control = $customFields->addHidden($customFieldId);
                     break;
                 case 'checkbox':
-                    $customFields->addCheckbox($customFieldId, $customFieldConfig['label'] ?? '')
-                        ->setDefaultValue($customFieldConfig['defaultValue'] ?? null);
+                    $control = $customFields->addCheckbox($customFieldId, $customFieldConfig['label'] ?? '');
                     break;
                 case 'text':
-                    $customFields->addText($customFieldId, $customFieldConfig['label'] ?? '')
-                        ->setDefaultValue($customFieldConfig['defaultValue'] ?? null);
+                    $control = $customFields->addText($customFieldId, $customFieldConfig['label'] ?? '');
                     break;
                 default:
                     throw new InvalidArgumentException('Unknown customField type "' . $customFieldConfig['type'] . '"');
+            }
+
+            $disabledAction = $customFieldConfig['disabledAction'] ?? false;
+            if ($disabledAction === 'all' ||
+                ($disabledAction === 'add' && $this->issue === null) ||
+                ($disabledAction === 'edit' && $this->issue !== null)
+            ) {
+                // disable editation
+                $control->setDisabled();
+            }
+
+            if (isset($customFieldConfig['defaultValue'])) {
+                $control->setDefaultValue($customFieldConfig['defaultValue']);
             }
         }
 
