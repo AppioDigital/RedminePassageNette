@@ -93,7 +93,7 @@ class ProjectIssueService
      */
     public function getAllIssues(): array
     {
-        return $this->issueManager->findAllByProject($this->projectManager->getId(), $this->defaults['params']);
+        return $this->issueManager->findAllByProject($this->projectManager->getId(), $this->defaults['params'] ?? []);
     }
 
     /**

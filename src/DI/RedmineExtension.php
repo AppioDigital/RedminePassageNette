@@ -33,6 +33,8 @@ class RedmineExtension extends CompilerExtension implements IClientProvider
         Validators::assert($this->config['baseUri'], 'uri');
         Validators::assert($this->config['defaultProjectId'], 'int|null');
 
+        $this->config['defaults'] = $this->config['defaults'] ?? [];
+
         // validate defaults structure
         foreach ($this->config['defaults'] ?? [] as $projectId => $projectDefaults) {
             if ($projectId === 'default') {
