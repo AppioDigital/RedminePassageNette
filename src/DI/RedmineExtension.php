@@ -36,7 +36,7 @@ class RedmineExtension extends CompilerExtension implements IClientProvider
         $this->config['defaults'] = $this->config['defaults'] ?? [];
 
         // validate defaults structure
-        foreach ($this->config['defaults'] ?? [] as $projectId => $projectDefaults) {
+        foreach ($this->config['defaults'] as $projectId => $projectDefaults) {
             if ($projectId === 'default') {
                 continue;
             }

@@ -57,6 +57,15 @@ class IssueFormControl extends Control
 
         $form->addGroup($mainGroupName);
 
+        $trackerControl = $form->addSelect('tracker', 'Typ', $this->issueService->getTrackersList())
+            ->setRequired();
+
+        if ($this->issue !== null) {
+            $trackerControl->setDisabled();
+        } else {
+            $trackerControl->setDefaultValue($this->issueService->getDefaultTrackerId());
+        }
+
         $form->addSelect('priority', 'Priorita', $this->issueService->getPrioritiesList())
             ->setRequired();
 
@@ -100,6 +109,7 @@ class IssueFormControl extends Control
 
 
             $form->setDefaults([
+                'tracker' => $this->issue->getTrackerId(),
                 'priority' => $this->issue->getPriorityId(),
                 'subject' => $this->issue->getSubject(),
                 'description' => $this->issue->getDescription(),

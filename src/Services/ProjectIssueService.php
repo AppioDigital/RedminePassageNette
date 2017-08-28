@@ -107,9 +107,7 @@ class ProjectIssueService
         }
 
         if ($issueDto->hasTrackerId() === false) {
-            $issueDto->setTrackerId(
-                $this->defaults['trackerId'] ?? $this->trackerManager->getDefaultTracker()->getId()
-            );
+            $issueDto->setTrackerId($this->getDefaultTrackerId());
         }
 
         if ($issueDto->hasStatusId() === false) {
@@ -142,6 +140,8 @@ class ProjectIssueService
             if ($issue->getAssignedToId() !== null) {
                 $issueDto->setAssignedToId($issue->getAssignedToId());
             }
+        } else {
+            $issueDto->setTrackerId($values->tracker);
         }
 
         $issueDto->setPriorityId($values->priority);
@@ -244,5 +244,13 @@ class ProjectIssueService
     public function getCustomFieldsConfig(): array
     {
         return $this->defaults['customFields'] ?? [];
+    }
+
+    /**
+     * @return int
+     */
+    public function getDefaultTrackerId(): int
+    {
+        return (int) ($this->defaults['trackerId'] ?? $this->trackerManager->getDefaultTracker()->getId());
     }
 }
